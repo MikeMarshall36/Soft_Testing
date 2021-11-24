@@ -10,6 +10,19 @@ change_directory = 'Move_to_Dir'
 original_name = 'Rename_my.txt'
 Second_name = 'Renamed_file.txt'
 
+@pytest.fixture()
+def file_edit():
+    global file_name, file_content
+    touch(file_name)
+    edit_file(file_name, file_content)
+    return os.path.getsize(file_name)
+
+def test_file_edit(file_edit):
+    global file_name
+    assert file_edit != 0
+    rm(file_name)
+
+
 @pytest.fixture() #Запись в файл + просмотр содержимого
 def file_cont():
     global file_name, file_content
@@ -69,7 +82,7 @@ def dir_switch_f():
     path1 = os.getcwd()
     mkdir_py(change_directory)
     chdir(change_directory)
-    touch('Oleja.txt')
+    touch('Move.txt')
     return path1
 
 
