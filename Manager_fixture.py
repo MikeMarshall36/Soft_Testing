@@ -146,3 +146,4 @@ def rename_file():
 def test_rename_file(rename_file):
     global original_name, Second_name
     assert original_name not in F_list('') and Second_name in F_list('')
+    rm(Second_name)
