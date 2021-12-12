@@ -2,6 +2,7 @@ from File_manager_test import *
 import os
 import shutil
 import pytest
+negative_file_name = 'File do not exist'
 file_name = 'Test.txt'
 file_content = 'Hello world '
 test_name = 'ABTest'
@@ -10,7 +11,7 @@ change_directory = 'Move_to_Dir'
 original_name = 'Rename_my.txt'
 Second_name = 'Renamed_file.txt'
 
-@pytest.fixture()
+@pytest.fixture() # Запись в файл
 def file_edit():
     global file_name, file_content
     touch(file_name)
@@ -22,8 +23,7 @@ def test_file_edit(file_edit):
     assert file_edit != 0
     rm(file_name)
 
-
-@pytest.fixture() #Запись в файл + просмотр содержимого
+@pytest.fixture() # Просмотр содержимого
 def file_cont():
     global file_name, file_content
     touch(file_name)
@@ -160,3 +160,56 @@ def test_rename_file(rename_file):
     global original_name, Second_name
     assert original_name not in F_list('') and Second_name in F_list('')
     rm(Second_name)
+
+## Негативные тесты ##
+
+@pytest.fixture()
+def negative_move_to_dir(): #Негативный тест по копированию несуществующего файла в указанную папку.
+    dir_name = 'File_Copies'
+    name_of_file = 'second_file_to_copy.txt'
+    mkdir_py(dir_name)
+    curDir = False
+    nextDir = False
+    still = False
+    if name_of_file in F_list(''):
+        curDir = True
+    copy_folder(name_of_file, dir_name)
+    chdir(dir_name)
+    if name_of_file in F_list(''):
+        nextDir = True
+    chdir('back')
+    if name_of_file in F_list(''):
+        still = True
+    if curDir == nextDir == still:
+        return True
+    else:
+        return False
+
+@pytest.mark.xfail
+def test_negative_move_to_dir(negative_move_to_dir):
+    assert negative_move_to_dir == True
+
+
+@pytest.fixture()
+def negative_Delete_file(): #Негативный тест на удаление файла без указания его расширения
+    global negative_file_name
+    touch(negative_file_name+'.txt')
+    #rm(negative_file_name)
+    return negative_file_name +'.txt'
+
+@pytest.mark.xfail()
+def test_negative_Delete_file(negative_Delete_file):
+    assert negative_Delete_file not in F_list('')
+
+@pytest.fixture() # Запись в файл, без указания расширения
+def negative_file_edit():
+    global negative_file_name, file_content
+    touch(negative_file_name+'.txt')
+    edit_file(negative_file_name, file_content)
+    return os.path.getsize(negative_file_name+'.txt')
+
+@pytest.mark.xfail()
+def test_negative_file_edit(negative_file_edit):
+    global negative_file_name
+    assert negative_file_name != 0
+    rm(negative_file_name)
