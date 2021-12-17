@@ -7,7 +7,13 @@ login = 'AlexBit@gmail.ru'
 name = 'Valera'
 animal_type = 'Bastard'
 age = '23'
-test_pic = '2aeff7fd0b19382eac29fb7938e59afa.jpg'
+test_pic = 'maxresdefault (1).jpg'
+name_t = 'Oleg'
+animal_type_t = 'Bastard'
+age_t = '25'
+test_pic_2 = 'vehicle-airplane-aircraft-military-aircraft-Lockheed-Martin-F-35-Lightning-II-Mikoyan-MiG-29-McDonnell-Douglas-F-15-Eagle-Lockheed-Martin-McDonnell-Douglas-F-4-Phantom-II-F-35-Lightning-II-air-force-McDonnell-Do.jpg'
+
+
 
 class PetFriends_testing:
     def __init__(self):
@@ -108,7 +114,7 @@ class PetFriends_testing:
             result = res.text
         return result
 
-    def put_edit_pet_info(self, auth_key:json, pet_id:json, name:str, animal_type:str, age:str):
+    def put_edit_pet_info(self, auth_key:json, pet_id:json, name:str='', animal_type:str='', age:str=''):
         data = {'name': name, 'animal_type': animal_type, 'age': age, 'pet_id':pet_id['id']}
         petID = data['pet_id']
         print('ID:',petID)
@@ -158,11 +164,13 @@ def post_pet_creat():
     global name, animal_type, age, key
     test = PetFriends_testing()
     result = test.post_pet_creation(key, name, animal_type, age)
-    return result['id']
+    return result
+
 
 def test_post_pet_creat(post_pet_creat):
     petList = test.get_list_of_pets(key,'my_pets')
-    assert post_pet_creat in petList['pets'][0]['id']
+    assert post_pet_creat['id'] in petList['pets'][0]['id']
+    test.delete_pets(key, post_pet_creat)
 
 @pytest.fixture()
 def negative_list_of_pets():
@@ -186,8 +194,61 @@ def post_set_pic():
     post_cond = test.get_list_of_pets(key,'my_pets')
     post_cond = ['pets'][0]
     if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
         return True
     else:
         return False
+
 def test_post_set_pic(post_set_pic):
     assert  post_set_pic != False
+
+@pytest.fixture()
+def post_full_creation():
+    global name_t, animal_type_t, age_t, key, test_pic_2
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    test_pet = test.post_set_pet(key, name_t, animal_type_t, age_t, test_pic_2)
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+def test_post_set_pet(post_full_creation):
+    assert post_full_creation != False
+
+@pytest.fixture()
+def delete_pet():
+    global key, pet
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    test.delete_pets(key,pet)
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+def test_delete_pet(delete_pet):
+    assert delete_pet != False
+
+@pytest.fixture()
+def put_pet_info():
+    test_pet = test.post_set_pet(key,name_t,animal_type_t,age_t,test_pic_2)
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    updated_pet = test.put_edit_pet_info(key,test_pet,animal_type='Существо X')
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+def test_put_pet_info(put_pet_info):
+    assert put_pet_info != False
