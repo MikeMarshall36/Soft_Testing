@@ -12,7 +12,7 @@ name_t = 'Oleg'
 animal_type_t = 'Bastard'
 age_t = '25'
 test_pic_2 = 'vehicle-airplane-aircraft-military-aircraft-Lockheed-Martin-F-35-Lightning-II-Mikoyan-MiG-29-McDonnell-Douglas-F-15-Eagle-Lockheed-Martin-McDonnell-Douglas-F-4-Phantom-II-F-35-Lightning-II-air-force-McDonnell-Do.jpg'
-
+test_pic_3 = '.jpg'
 
 
 class PetFriends_testing:
@@ -173,18 +173,6 @@ def test_post_pet_creat(post_pet_creat):
     test.delete_pets(key, post_pet_creat)
 
 @pytest.fixture()
-def negative_list_of_pets():
-    test = PetFriends_testing()
-    result = test.get_list_of_pets(key)
-    print(result)
-    return result
-
-@pytest.mark.xfail(reason='Отсутствует API ключ')
-def test_negative_list_of_pets():
-    assert list_of_pets['pets'] != '' and len(list_of_pets['pets']) != 0
-
-
-@pytest.fixture()
 def post_set_pic():
     global name, animal_type, age, key, test_pic
     test_pet = test.post_pet_creation(key, name, animal_type, age)
@@ -200,7 +188,7 @@ def post_set_pic():
         return False
 
 def test_post_set_pic(post_set_pic):
-    assert  post_set_pic != False
+    assert post_set_pic != False
 
 @pytest.fixture()
 def post_full_creation():
@@ -252,3 +240,52 @@ def put_pet_info():
 
 def test_put_pet_info(put_pet_info):
     assert put_pet_info != False
+
+## Негативные тесты
+
+@pytest.fixture()
+def negative_list_of_pets():
+    test = PetFriends_testing()
+    result = test.get_list_of_pets(key)
+    print(result)
+    return result
+
+@pytest.mark.xfail(reason='Отсутствует API ключ')
+def test_negative_list_of_pets():
+    assert list_of_pets['pets'] != '' and len(list_of_pets['pets']) != 0
+
+@pytest.fixture()
+def negative_pet_set_pic():
+    test_pet = test.post_pet_creation(key, name, animal_type, age)
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    test.post_set_image(key, test_pet, test_pic_3)
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+@pytest.mark.xfail(reason='Используется несуществующая картинка')
+def test_negative_pet_set_pic(negative_pet_set_pic):
+    assert negative_pet_set_pic != False
+
+@pytest.fixture()
+def negative_delete_pet():
+    global key,pet
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    test.delete_pets(key,pet)
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+@pytest.mark.xfail(reason='Введённый петомец не существует в БД или был из неё удалён ранее')
+def test_negative_delete_pet(negative_delete_pet):
+    assert negative_delete_pet != False
