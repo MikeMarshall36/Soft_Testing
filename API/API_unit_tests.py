@@ -20,7 +20,6 @@ def list_of_pets():
     global key
     test = PetFriends_testing()
     result = test.get_list_of_pets(key)
-    print(result)
     return result
 
 def test_list_of_pets(list_of_pets):
@@ -136,11 +135,26 @@ def negative_pet_set_pic():
     else:
         return False
 
+
+@pytest.fixture()
+def negative_pet_set_pic():
+    test.delete_pets(key, negative_pet)
+    test_pet = test.post_pet_creation(key, name, animal_type, age)
+    pre_cond = test.get_list_of_pets(key, 'my_pets')
+    pre_cond = pre_cond['pets'][0]
+    test.post_set_image(key, test_pet, test_pic_3)
+    post_cond = test.get_list_of_pets(key, 'my_pets')
+    post_cond = ['pets'][0]
+    if post_cond != pre_cond:
+        test.delete_pets(key, pre_cond)
+        return True
+    else:
+        return False
+
+
 @pytest.mark.xfail(reason='Используется несуществующая картинка')
 def test_negative_pet_set_pic(negative_pet_set_pic):
     assert negative_pet_set_pic != False
-
-
 
 @pytest.fixture()
 def negative_delete_pet():

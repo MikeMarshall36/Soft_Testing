@@ -104,18 +104,20 @@ class PetFriends_testing:
             result = res.text
         return result
 
-    def put_edit_pet_info(self, auth_key:json, pet_id:json, name:str='', animal_type:str='', age:str=''):
-        data = {'name': name, 'animal_type': animal_type, 'age': age, 'pet_id':pet_id['id']}
-        petID = data['pet_id']
+    def put_edit_pet_info(self, auth_key:json, pet_id:json, name:str='', animal_type:str='', age:str='', pet_photo:str='placeholder.jpg'):
+        data = MultipartEncoder(
+            fields={'pet_id': pet_id['id'],'name': name, 'animal_type': animal_type, 'age': age, 'pet_id':pet_id['id'],
+                    'pet_photo': (pet_photo, open(pet_photo, 'rb'), 'image/jpeg')
+                    }
+        )
+        petID = data.fields['pet_id']
         print('ID:',petID)
-        header = {'auth_key':auth_key['key']}
+        header = {'auth_key': auth_key['key'], 'Content-Type': data.content_type}
         res = requests.put(self.base_url + f'/api/pets/{petID}', headers=header, data=data)
         result = ''
         try:
             result = res.json()
         except json.decoder.JSONDecodeError:
             result = res.text
-        print(res.status_code,result)
+        print(res.status_code, result)
         return result
-
-Oleg = 45

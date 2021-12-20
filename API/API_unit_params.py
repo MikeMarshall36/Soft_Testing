@@ -4,31 +4,27 @@ import pytest
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import json
-petList = test.get_list_of_pets(key,'my_pets')
 
-@pytest.mark.parametrize("login, passwd, expected_result", [(login,passwd, key)])
+
+@pytest.mark.parametrize("login, passwd, expected_result", log_in_data)
 def test_get_apiKey(login,passwd,expected_result):
     res = test.get_api_key(login,passwd)
     assert res == expected_result
 
-@pytest.fixture()
-def list_of_pets():
-    global key
-    test = PetFriends_testing()
-    result = test.get_list_of_pets(key)
-    return result
+@pytest.mark.parametrize("input_key, expected_result", list_data)
+def test_get_list(input_key,expected_result):
+    res = test.get_list_of_pets(input_key)
+    assert res == expected_result
 
-def test_list_of_pets(list_of_pets):
-    assert list_of_pets['pets'] != '' and len(list_of_pets['pets']) != 0
 
-@pytest.mark.parametrize("name, animal_type, age, expexted_result",[('Oleg', 'SlaveANIN', '12', petList), ('Murka', 'cat', '8', petList)])
+@pytest.mark.parametrize("name, animal_type, age, expexted_result", no_pic_data)
 def test_post_pet_np(name,animal_type, age,expexted_result):
     res = test.post_pet_creation(key, name, animal_type, age)
     expexted_result = test.get_list_of_pets(key, 'my_pets')
     assert res['id'] in expexted_result['pets'][0]['id']
     test.delete_pets(key, res)
 
-@pytest.mark.parametrize("name, animal_type, age, picture,expexted_result",[('Oleg', 'DvorTeryer', '12', test_pic_2, petList),('Murka', 'cat', '8',test_pic ,petList)])
+@pytest.mark.parametrize("name, animal_type, age, picture,expexted_result",pic_dataN)
 def test_post_pet_pic(name, animal_type, age, picture, expexted_result):
     res = test.post_set_pet(key, name, animal_type, age, picture)
     expexted_result = test.get_list_of_pets(key, 'my_pets')
@@ -47,7 +43,7 @@ def test_post_pic(name,animal_type,age,picture,expexted_result):
             assert pre_cond != expexted_result and res['pet_photo'] in expexted_result['pets'][0]['pet_photo']
     test.delete_pets(key, res)
 
-@pytest.mark.parametrize("name, animal_type, age, picture ,expexted_result",[('Oleg', 'DvorTeryer', '12', test_pic, petList),('Murka', 'cat', '8', test_pic_43 ,petList)])
+@pytest.mark.parametrize("name, animal_type, age, picture,expexted_result",doble_typed)
 def test_put_pet_info(name,animal_type,age,picture,expexted_result):
     res = test.post_set_pet(key, name, animal_type, age, picture)
     pre_cond = test.get_list_of_pets(key, 'my_pets')
@@ -59,7 +55,7 @@ def test_put_pet_info(name,animal_type,age,picture,expexted_result):
             assert pre_cond != expexted_result and res['animal_type'] in expexted_result['pets'][0]['animal_type']
     test.delete_pets(key, res)
 
-@pytest.mark.parametrize("name, animal_type, age, picture,expexted_result",[('Oleg', 'DvorTeryer', '12', test_pic_2, petList),('Murka', 'cat', '8',test_pic ,petList)])
+@pytest.mark.parametrize("name, animal_type, age, picture,expexted_result",pic_dataN)
 def test_delete_pets(name,animal_type,age,picture,expexted_result):
     res = test.post_pet_creation(key, name, animal_type, age)
     pre_cond = test.get_list_of_pets(key, 'my_pets')
