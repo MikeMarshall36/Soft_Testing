@@ -22,8 +22,7 @@ class PetFriends_testing:
         except json.decoder.JSONDecodeError:
             result = res.text
 
-        print(status, result)
-        return result
+        return status, result
 
     def get_list_of_pets(self, auth_key:json, filter: str = '') -> json:
 
@@ -39,7 +38,7 @@ class PetFriends_testing:
             result = res.text
 
         print(status, result)
-        return result
+        return status, result
 
     def post_pet_creation(self, auth_key:json, name:str, animal_type:str, age:str) -> json:
         header ={'auth_key': auth_key['key']}
@@ -53,7 +52,7 @@ class PetFriends_testing:
         except json.decoder.JSONDecodeError:
             result = res.text
         print(status, result)
-        return result
+        return status, result
 
     def post_set_pet(self, auth_key:json, name:str, animal_type:str, age:str, pet_photo:str) -> json:
         data = MultipartEncoder(
@@ -65,13 +64,14 @@ class PetFriends_testing:
         )
         header = {'auth_key':auth_key['key'],'Content-Type':data.content_type}
         res = requests.post(self.base_url + 'api/pets', headers=header, data=data)
+        status = res.status_code
         result = ''
 
         try:
             result = res.json()
         except json.decoder.JSONDecodeError:
             result = res.text
-        return result
+        return status, result
 
     def post_set_image(self, auth_key:json, pet_id:json, pet_photo:str) -> json:
         data = MultipartEncoder(
@@ -84,25 +84,27 @@ class PetFriends_testing:
         header = {'auth_key': auth_key['key'], 'Content-Type': data.content_type}
 
         res = requests.post(self.base_url + f'/api/pets/set_photo/{petID}', headers=header, data=data)
+        status = res.status_code
         result = ''
 
         try:
             result = res.json()
         except json.decoder.JSONDecodeError:
             result = res.text
-        return result
+        return status, result
 
     def delete_pets(self, auth_key:json, pet_id:json):
         data = {'pet_id':pet_id['id']}
         petID = data['pet_id']
         header = {'auth_key':auth_key['key']}
         res = requests.delete(self.base_url + f'/api/pets/{petID}', headers=header)
+        status = res.status_code
         result = ''
         try:
             result = res.json()
         except json.decoder.JSONDecodeError:
             result = res.text
-        return result
+        return status, result
 
     def put_edit_pet_info(self, auth_key:json, pet_id:json, name:str='', animal_type:str='', age:str='', pet_photo:str='placeholder.jpg'):
         data = MultipartEncoder(
@@ -114,10 +116,10 @@ class PetFriends_testing:
         print('ID:',petID)
         header = {'auth_key': auth_key['key'], 'Content-Type': data.content_type}
         res = requests.put(self.base_url + f'/api/pets/{petID}', headers=header, data=data)
+        status = res.status_code
         result = ''
         try:
             result = res.json()
         except json.decoder.JSONDecodeError:
             result = res.text
-        print(res.status_code, result)
-        return result
+        return status, result

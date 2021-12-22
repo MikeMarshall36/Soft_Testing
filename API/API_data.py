@@ -15,10 +15,11 @@ test_pic_4 = '12929640885_674811ecd3_o.jpg'
 test_pic_43 = '85MgKN.jpg'
 
 test = PetFriends_testing()
-key = test.get_api_key(login, passwd)
+_, key = test.get_api_key(login, passwd)
+print(f'Ключ: {key}')
 key_n = '1238976432-0285342-3249'
-petList = test.get_list_of_pets(key,'my_pets')
-petList_main = test.get_list_of_pets(key)
+_, petList = test.get_list_of_pets(key,'my_pets')
+_, petList_main = test.get_list_of_pets(key)
 
 no_pic_data = [('Oleg', 'SlaveANIN', '12', petList),
                ('Murka', 'cat', '8', petList),
