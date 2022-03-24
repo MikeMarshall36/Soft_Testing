@@ -1,4 +1,4 @@
-# Soft_Testing
+# Soft_Testing \n
 pyTest + other
 Файл File_manager_test.py содержит себе все функции файлового менеджера
 Файл Manager_fixture.py содержит в себе unit тесты для тестирования файлового менеджера
